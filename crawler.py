@@ -15,10 +15,10 @@ from tweepy import OAuthHandler
 #   Tweepy can be installed wit pip: pip install tweepy
 #############
 
-consumer_key = '14OB10FJSwIWIiYDlm5UMLGjs'
-consumer_secret = 'iMCq73JQI8F99WaTKhXFj185BN3eLPWRRwSoBVfnH7bLPYh6lg'
-access_token = '192628849-rv7jsrVU2ASppsOqy4xcW3DLrpzRCY1s34lHvV9g'
-access_token_secret = 'fk5pPw1qyxJajLn2ia58DN0kVqM3sSV9IMpwGp437z9PD'
+consumer_key = ''
+consumer_secret = ''
+access_token = ''
+access_token_secret = ''
 
 auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
