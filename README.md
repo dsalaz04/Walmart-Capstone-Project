@@ -81,6 +81,8 @@ compromising associate privacy.
 * [Bootstrap](https://getbootstrap.com)
 * [NLTK](https://www.nltk.org)
 * [MongoDB](https://www.mongodb.com)
+* [PyMongo](https://pymongo.readthedocs.io/en/stable/)
+* [Tweepy](https://www.tweepy.org)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
