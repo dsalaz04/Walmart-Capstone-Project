@@ -189,10 +189,11 @@ Project Link: [https://github.com/dsalaz04/Walmart-Capstone-Project](https://git
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* [Jonathan](gitghub.com/jonathan)
-* [Kayla]()
+* [Jonathan](https://github.com/Jmont03)
+* [Kayla](https://github.com/kaylasam)
 * [Caleb]()
 * [Tanner]()
+* [Josh]()
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
