@@ -13,7 +13,7 @@ Undergraduate Capstone project for the University of Arkansas department of Comp
 <br />
 <div align="center">
   <a href="https://github.com/dsalaz04/Walmart-Capstone-Project">
-    <img src="Images/logo.png" alt="Logo" width="80" height="80">
+    <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Walmart Social Media Sentiment Analysis Tool</h3>
