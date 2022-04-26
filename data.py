@@ -1,0 +1,66 @@
+"""
+includes tokens specific to r/Walmart to help gauge positive/neutral/negative sentiment
+"""
+
+possible_catalysts = {'OGP', 'manager', 'covid', 'customer', 'pay', 'wage', 'coach', 'PTO', 'warehouse',
+                      'zoning', 'wages', 'overnight', 'ASM', 'union', 'unionize', 'unionizing', 'vest', 'vests',
+                      'retail', 'pallets', 'vendors', 'Amazon', 'promoted', 'promotion', 'pandemic', 'masks', 'ppto'}
+
+# includes common words and words used on walmart that don't hold much importance
+blacklist = {'that', 'this', 'and', 'of', 'the', 'for', 'I', 'it', 'has', 'in',
+             'you', 'to', 'was', 'but', 'have', 'they', 'a', 'is', '', 'be', 'on', 'are', 'an', 'or',
+             'at', 'as', 'do', 'if', 'your', 'not', 'can', 'my', 'their', 'them', 'they', 'with',
+             'at', 'about', 'would', 'like', 'there', 'You', 'from', 'get', 'just', 'more', 'so',
+             'me', 'more', 'out', 'up', 'some', 'will', 'how', 'one', 'what', "don't", 'should',
+             'could', 'did', 'no', 'know', 'were', 'did', "it's", 'This', 'he', 'The', 'we',
+             'all', 'when', 'had', 'see', 'his', 'him', 'who', 'by', 'her', 'she', 'our', 'thing', '-',
+             'now', 'what', 'going', 'been', 'we', "I'm", 'than', 'any', 'because', 'We', 'even',
+             'said', 'only', 'want', 'other', 'into', 'He', 'what', 'i', 'That', 'thought',
+             'think', "that's", 'Is', 'much'}
+
+# r/Walmart specific words to improve sentiment analysis, score: 4.0 to -4.0
+new_words = {
+    'expectations': -4.0,
+    'fired': -4.0,
+    'fuck': -4.0,
+    'fucking': -4.0,
+    'shit': -4.0,
+    'terminated': -4.0,
+    'coached': -4.0,
+    'coaching': -4.0,
+    'asshole': -4.0,
+    'quitting': -4.0,
+    'ridiculous': -4.0,
+    'expensive': -4.0,
+    'stress': -4.0,
+    'understaffed': -4.0,
+    'lack': -4.0,
+    'broken': -4.0,
+    'pain': -4.0,
+    'hurt': -4.0,
+    'done': -4.0,
+    'mental': -4.0,
+    'stressed': -4.0,
+    'idiot': -4.0,
+    'idiots': -4.0,
+    'fucks': -4.0,
+    'hate': -4.0,
+    'screwed': -4.0,
+    'pissed': -4.0,
+    'wtf': -4.0,
+    'bullshit': -4.0,
+    'awesome': 4.0,
+    'gone': -1.0,
+    'money': -1.2,
+    'offering': -2.3,
+    'rip': -4.0,
+    'downgrade': -3.0,
+    'complaining': -3.0,
+    'corporate': -3.0,
+    'upgrade': 4.0,
+    'maintain': 1.0,
+    'bonuses': 1.0,
+    'scam': -2.0,
+    'positive': 3.0,
+    'upwards': 3.0,
+    'prediction': 1.0}
