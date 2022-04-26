@@ -71,7 +71,7 @@ meaningful data while maintaining anonimity across the board.
 
 <div align="center">
   <a href="https://github.com/dsalaz04/Walmart-Capstone-Project">
-    <img src="images/sentiment.png" alt="Sentiment" width="200" height="200">
+    <img src="images/sentiment.png" alt="Sentiment" width="400" height="400">
   </a>
 </div>
 
