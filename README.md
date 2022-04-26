@@ -69,6 +69,12 @@ To better understand our associates and the way they feel about the company, We 
 employees are saying about Walmart in an open-discussion environment. This tool will allow us to do so, gathering
 meaningful data while maintaining anonimity across the board.
 
+<div align="center">
+  <a href="https://github.com/dsalaz04/Walmart-Capstone-Project">
+    <img src="images/sentiment.png" alt="Sentiment" width="200" height="200">
+  </a>
+</div>
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
