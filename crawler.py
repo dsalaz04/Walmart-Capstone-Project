@@ -3,7 +3,7 @@
 # Description: Tweet Crawler using Twitter API
 # -*- coding: utf-8 -*-
 # Copyright 2021 University of Arkansas Capstone Group 10
-
+import sys
 import time
 import datetime
 from pymongo import MongoClient

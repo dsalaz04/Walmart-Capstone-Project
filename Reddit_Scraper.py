@@ -7,6 +7,7 @@
 import praw
 import pandas as pd
 from praw.models import MoreComments
+from datetime import date
 
 
 def reddit_scraper(reddit_read_only, subreddit):
@@ -52,9 +53,8 @@ def reddit_scraper(reddit_read_only, subreddit):
 
     # Saving the data in a pandas dataframe
     top_posts = pd.DataFrame(posts_dict)
-    top_posts
 
-    top_posts.to_csv("Top Posts.csv", index=True)
+    top_posts.to_csv(f"Top_Posts_{date.today()}.csv", index=True)
 
     # URL of the post
     url = "https://www.reddit.com/gallery/soivqj"
@@ -72,14 +72,19 @@ def reddit_scraper(reddit_read_only, subreddit):
 
     # creating a dataframe
     comments_df = pd.DataFrame(post_comments, columns=['comment'])
-    comments_df
 
     comments_df.to_csv("Top Comments.csv", index=True)
 
 
 if __name__ == '__main__':
 
-    reddit_read_only = praw.Reddit(client_id="", client_secret="", user_agent="")
-    subreddit = reddit_read_only.subreddit("walmart")
+    # Make a read-only [Reddit] instance.
+    reddit = praw.Reddit(
+        client_id="WVZEOp-43RA9pQBqApal7g",
+        client_secret="",
+        user_agent="CrawlerScript",
+    )
 
-    reddit_scraper(reddit_read_only, subreddit)
+    subreddit = reddit.subreddit("walmart")
+
+    reddit_scraper(reddit, subreddit)
