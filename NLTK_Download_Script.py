@@ -1,6 +1,6 @@
 """NLTK Download Script.
 
-NLTK requires some extra steps in order to make use of all its wonderful features. Line 18 in this script will download
+NLTK requires some extra steps in order to make use of all its wonderful features. Line 23 in this script will download
 whatever is in the parameter to the appropriate location on your machine. This may be a stupid way to do this, but it
 works for me on my machine with my very low standard for cleanliness so this is what you get.
 
