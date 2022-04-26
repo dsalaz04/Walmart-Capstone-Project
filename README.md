@@ -66,8 +66,8 @@ Undergraduate Capstone project for the University of Arkansas department of Comp
 ## About The Project
 
 To better understand our associates and the way they feel about the company, We need a way to gather data on what
-employees are saying about Walmart in an open-discussion environment. This tool will allow us to do so without
-compromising associate privacy.
+employees are saying about Walmart in an open-discussion environment. This tool will allow us to do so, gathering
+meaningful data while maintaining anonimity across the board.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
