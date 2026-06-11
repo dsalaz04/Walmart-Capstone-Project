@@ -1,96 +1,82 @@
-"""Common word finder
+"""Survey a subreddit (or CSV) for its most common meaningful words.
 
-When programming NLP for a specific subreddit, I need to gather a list of meaningful words in order to fulfill one
-of the requirements to make a good sentiment analysis tool. This script will gather that list and tell me everything I
-want to know about a subreddit, specifically, its most commonly used words. This process takes careful tweaking
-involving the blacklisted words. Too broad, and we risk missing out on words that could be meaningful to the subreddit.
-Too vague, and we risk false positives, namely, adding words that have no meaning to the subreddit.
-
+Used when tuning the analysis for a new community: the words this prints are
+candidates for the CATALYSTS topic list in data.py. Filters out the BLACKLIST of
+high-frequency filler words; tune that list until the output is meaningful — too
+strict and real topics are hidden, too loose and the list is all noise.
 """
 
-import praw
-import matplotlib.pyplot as plt
+from __future__ import annotations
+
+import argparse
+import sys
+from collections import Counter
+from pathlib import Path
+
+import matplotlib
+
+from data import BLACKLIST
+from reddit_sentiment import Comment, fetch_comments, load_csv, strip_token
 
 
-def find_common_words():
-    reddit = praw.Reddit(user_agent="",
-                         client_id="",
-                         client_secret="",
-                         username="",
-                         password="")
-
-    subreddit_name = "walmart"
-
-    subreddit = reddit.subreddit(subreddit_name)
-
-    top_subreddit = subreddit.top()
-    count = 0
-    MAX_WORDS = 10000
-    print('success')
-    words = []
-    wordCount = {}
-
-    commonWords = {'that', 'this', 'and', 'of', 'the', 'for', 'I', 'it', 'has', 'in',
-                   'you', 'to', 'was', 'but', 'have', 'they', 'a', 'is', '', 'be', 'on', 'are', 'an', 'or',
-                   'at', 'as', 'do', 'if', 'your', 'not', 'can', 'my', 'their', 'them', 'they', 'with',
-                   'at', 'about', 'would', 'like', 'there', 'You', 'from', 'get', 'just', 'more', 'so',
-                   'me', 'more', 'out', 'up', 'some', 'will', 'how', 'one', 'what', "don't", 'should',
-                   'could', 'did', 'no', 'know', 'were', 'did', "it's", 'This', 'he', 'The', 'we',
-                   'all', 'when', 'had', 'see', 'his', 'him', 'who', 'by', 'her', 'she', 'our', 'thing', '-',
-                   'now', 'what', 'going', 'been', 'we', "I'm", 'than', 'any', 'because', 'We', 'even',
-                   'said', 'only', 'want', 'other', 'into', 'He', 'what', 'i', 'That', 'thought',
-                   'think', "that's", 'Is', 'much'}
-
-    for submission in subreddit.top(limit=500):
-        submission.comments.replace_more(limit=0)
-        for top_level_comment in submission.comments:
-            count += 1
-            if count == MAX_WORDS:
-                break
-            word = ""
-            for letter in top_level_comment.body:
-                if letter == ' ':
-                    if word and not word[-1].isalnum():
-                        word = word[:-1]
-                    if not word.lower() in commonWords:
-                        words.append(word)
-                    word = ""
-                else:
-                    word += letter
-        if count == MAX_WORDS:
-            break
-
-    for word in words:
-        if word in wordCount:
-            wordCount[word] += 1
-        else:
-            wordCount[word] = 1
-
-    sortedList = sorted(wordCount, key=wordCount.get, reverse=True)
-
-    keyWords = []
-    keyCount = []
-    amount = 0
-
-    for entry in sortedList:
-        keyWords.append(entry)
-        keyCount.append(wordCount[entry])
-        amount += 1
-        if amount == 100:
-            break
-    print(keyWords)
-
-    labels = keyWords
-    sizes = keyCount
-    # explode = (0, 0.1, 0, 0)  # only "explode" the 2nd slice (i.e. 'Hogs')
-
-    plt.title('Top comments for: r/' + subreddit_name)
-    plt.pie(sizes, labels=labels, autopct='%1.1f%%',
-            shadow=True, startangle=90)
-    plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-
-    plt.show()
+def count_words(comments: list[Comment]) -> Counter:
+    """Count cleaned words across all comments, ignoring blacklist filler."""
+    counts: Counter = Counter()
+    for _, body in comments:
+        counts.update(word for raw in body.split()
+                      if (word := strip_token(raw)) and word not in BLACKLIST)
+    return counts
 
 
-if __name__ == '__main__':
-    find_common_words()
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Find the most common meaningful words in a subreddit.")
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument("--subreddit", default=None,
+                        help="subreddit to scrape live (needs API credentials)")
+    source.add_argument("--input", default=None,
+                        help="CSV with a 'comment' column to analyze offline")
+    parser.add_argument("--top", type=int, default=30,
+                        help="how many words to show (default: 30)")
+    parser.add_argument("--posts", type=int, default=25,
+                        help="post limit in live mode (default: 25)")
+    parser.add_argument("--save", default=None, metavar="DIR",
+                        help="write the chart to DIR instead of opening a window")
+    args = parser.parse_args(argv)
+
+    if not args.subreddit and not args.input:
+        parser.error("choose a source: --subreddit NAME or --input FILE.csv")
+    if args.save:
+        matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    comments = (load_csv(args.input) if args.input
+                else fetch_comments(args.subreddit, args.posts))
+    top = count_words(comments).most_common(args.top)
+    if not top:
+        print("No words found.")
+        return 1
+
+    source_name = args.input or f"r/{args.subreddit}"
+    print(f"Top {len(top)} words in {len(comments)} comments from {source_name}:")
+    for word, n in top:
+        print(f"  {word}: {n}")
+
+    # Horizontal bar chart, most common at the top.
+    words, counts = zip(*reversed(top))
+    plt.figure(figsize=(10, max(4, len(top) * 0.3)))
+    plt.barh(words, counts)
+    plt.title(f"Most common words: {source_name}")
+    plt.tight_layout()
+    if args.save:
+        out = Path(args.save)
+        out.mkdir(parents=True, exist_ok=True)
+        plt.savefig(out / "common_words.png", dpi=120, bbox_inches="tight")
+        print(f"\nChart written to {out}/common_words.png")
+    else:
+        plt.show()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,25 +1,35 @@
+"""Domain vocabulary for r/walmart sentiment analysis.
+
+CATALYSTS are the workplace topics worth tracking (pay, scheduling, management, ...).
+BLACKLIST holds high-frequency words with no topical meaning, used when surveying a
+subreddit for candidate catalysts. LEXICON adjusts VADER's scores for words that carry
+a specific charge in Walmart-employee speech (e.g. "coached" is a disciplinary action,
+strongly negative, not a sports term).
 """
-includes tokens specific to r/Walmart to help gauge positive/neutral/negative sentiment
-"""
 
-possible_catalysts = {'OGP', 'manager', 'covid', 'customer', 'pay', 'wage', 'coach', 'PTO', 'warehouse',
-                      'zoning', 'wages', 'overnight', 'ASM', 'union', 'unionize', 'unionizing', 'vest', 'vests',
-                      'retail', 'pallets', 'vendors', 'Amazon', 'promoted', 'promotion', 'pandemic', 'masks', 'ppto'}
+# Topics of interest. A comment counts toward a topic when it mentions one of these.
+CATALYSTS = {
+    'OGP', 'manager', 'covid', 'customer', 'pay', 'wage', 'coach', 'PTO', 'warehouse',
+    'zoning', 'wages', 'overnight', 'ASM', 'union', 'unionize', 'unionizing', 'vest',
+    'vests', 'retail', 'pallets', 'vendors', 'Amazon', 'promoted', 'promotion',
+    'pandemic', 'masks', 'ppto',
+}
 
-# includes common words and words used on walmart that don't hold much importance
-blacklist = {'that', 'this', 'and', 'of', 'the', 'for', 'I', 'it', 'has', 'in',
-             'you', 'to', 'was', 'but', 'have', 'they', 'a', 'is', '', 'be', 'on', 'are', 'an', 'or',
-             'at', 'as', 'do', 'if', 'your', 'not', 'can', 'my', 'their', 'them', 'they', 'with',
-             'at', 'about', 'would', 'like', 'there', 'You', 'from', 'get', 'just', 'more', 'so',
-             'me', 'more', 'out', 'up', 'some', 'will', 'how', 'one', 'what', "don't", 'should',
-             'could', 'did', 'no', 'know', 'were', 'did', "it's", 'This', 'he', 'The', 'we',
-             'all', 'when', 'had', 'see', 'his', 'him', 'who', 'by', 'her', 'she', 'our', 'thing', '-',
-             'now', 'what', 'going', 'been', 'we', "I'm", 'than', 'any', 'because', 'We', 'even',
-             'said', 'only', 'want', 'other', 'into', 'He', 'what', 'i', 'That', 'thought',
-             'think', "that's", 'Is', 'much'}
+# Common words to ignore when surveying a subreddit for new catalyst candidates.
+BLACKLIST = {
+    'that', 'this', 'and', 'of', 'the', 'for', 'i', 'it', 'has', 'in', 'you', 'to',
+    'was', 'but', 'have', 'they', 'a', 'is', '', 'be', 'on', 'are', 'an', 'or', 'at',
+    'as', 'do', 'if', 'your', 'not', 'can', 'my', 'their', 'them', 'with', 'about',
+    'would', 'like', 'there', 'from', 'get', 'just', 'more', 'so', 'me', 'out', 'up',
+    'some', 'will', 'how', 'one', 'what', "don't", 'should', 'could', 'did', 'no',
+    'know', 'were', "it's", 'he', 'we', 'all', 'when', 'had', 'see', 'his', 'him',
+    'who', 'by', 'her', 'she', 'our', 'thing', '-', 'now', 'going', 'been', "i'm",
+    'than', 'any', 'because', 'even', 'said', 'only', 'want', 'other', 'into',
+    'thought', 'think', "that's", 'much',
+}
 
-# r/Walmart specific words to improve sentiment analysis, score: 4.0 to -4.0
-new_words = {
+# VADER lexicon overrides tuned to r/walmart (scores range 4.0 to -4.0).
+LEXICON = {
     'expectations': -4.0,
     'fired': -4.0,
     'fuck': -4.0,
@@ -63,4 +73,5 @@ new_words = {
     'scam': -2.0,
     'positive': 3.0,
     'upwards': 3.0,
-    'prediction': 1.0}
+    'prediction': 1.0,
+}

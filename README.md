@@ -1,223 +1,106 @@
-# Walmart-Capstone-Project
-Undergraduate Capstone project for the University of Arkansas department of Computer Science and Computer Engineering, 2021-2022 academic year.
-
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
-
-
-<!-- PROJECT LOGO -->
-<br />
 <div align="center">
-  <a href="https://github.com/dsalaz04/Walmart-Capstone-Project">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
-
-<h3 align="center">Walmart Social Media Sentiment Analysis Tool</h3>
-
-  <p align="center">
-    We have built a tool to analyze sentiment across multiple social media platforms from Walmart associates by means of natural languge processing, machine learning, and data analysis techniques.
-    <br />
-    <a href="https://github.com/dsalaz04/Walmart-Capstone-Project"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/dsalaz04/Walmart-Capstone-Project">View Demo</a>
-    ·
-    <a href="https://github.com/dsalaz04/Walmart-Capstone-Project/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/dsalaz04/Walmart-Capstone-Project/issues">Request Feature</a>
+  <img src="images/logo.png" alt="Logo" width="80" height="80">
+  <h3>Walmart Social Media Sentiment Analysis Tool</h3>
+  <p>
+    Mine employee discussion on Reddit, find the workplace topics people are talking
+    about, and measure how they feel about each one — using NLP with a lexicon tuned
+    to how Walmart associates actually talk.
   </p>
 </div>
 
+Built as an undergraduate capstone project for the University of Arkansas Department of
+Computer Science and Computer Engineering (2021–2022), sponsored by Walmart: a way to
+gauge associate sentiment from open, anonymous discussion rather than surveys.
 
+## How it works
 
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
-
-
-
-<!-- ABOUT THE PROJECT -->
-## About The Project
-
-To better understand our associates and the way they feel about the company, We need a way to gather data on what
-employees are saying about Walmart in an open-discussion environment. This tool will allow us to do so, gathering
-meaningful data while maintaining anonimity across the board.
+1. **Collect** comments from well-received posts on a subreddit (r/walmart by default)
+   via the Reddit API — or from a CSV, no credentials needed.
+2. **Find topics.** Comments are matched against a curated list of workplace
+   "catalysts" (pay, management, scheduling, PTO, union talk, ...) in `data.py`. Each
+   author counts once per topic, so one prolific commenter can't skew the results.
+3. **Score sentiment** per topic with NLTK's VADER, with one crucial twist: a custom
+   lexicon for Walmart-employee vocabulary. In ordinary English "coached" is neutral —
+   at Walmart it's a disciplinary action, and the lexicon scores it accordingly.
+4. **Report**: a treemap of the most-mentioned topics and a per-topic sentiment chart.
 
 <div align="center">
-  <a href="https://github.com/dsalaz04/Walmart-Capstone-Project">
-    <img src="images/sentiment.png" alt="Sentiment" width="400" height="400">
-  </a>
+  <img src="images/sentiment.png" alt="Sentiment by topic" width="560">
 </div>
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+## Quick start (no credentials)
 
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+python reddit_sentiment.py --input sample_comments.csv
+```
 
+NLTK data downloads automatically on first run. Add `--save charts/` to write the
+charts to files instead of opening windows.
 
-### Built With
+## Live mode
 
-* [Python](https://www.python.org)
-* [Javascript](https://www.javascript.com)
-* [Angular](https://angular.io/)
-* [Bootstrap](https://getbootstrap.com)
-* [NLTK](https://www.nltk.org)
-* [MongoDB](https://www.mongodb.com)
-* [PyMongo](https://pymongo.readthedocs.io/en/stable/)
-* [Tweepy](https://www.tweepy.org)
+Create a (free) script app at [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps), then:
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+```bash
+export REDDIT_CLIENT_ID=...
+export REDDIT_CLIENT_SECRET=...
+python reddit_sentiment.py --subreddit walmart --posts 25
+```
 
+Options: `--top N` (topics in the treemap), `--analyze N` (topics to sentiment-score),
+`--posts N` (post limit), `--save DIR`.
 
-<!-- GETTING STARTED -->
-## Getting Started
+## Tuning it for another community
 
-To get started, simply follow the guide outlined below before making any changes.
+`common_word_finder.py` surveys a subreddit (or CSV) for its most common meaningful
+words — candidates for the catalyst list:
 
-### Prerequisites
+```bash
+python common_word_finder.py --input sample_comments.csv --top 30
+```
 
-The year is 2022 and some of us are still acting like PyCharm isn't the best IDE
-for Python projects. I'm not upset, but rather confused. Download PyCharm if you
-don't know how to run this project otherwise.
+Then edit `data.py`: add topics to `CATALYSTS`, noise words to `BLACKLIST`, and
+community-specific sentiment words to `LEXICON`.
 
-* Get the community version at [https://www.jetbrains.com/pycharm/](https://www.jetbrains.com/pycharm/)
+## Tests
 
-### Installation
+```bash
+python -m unittest discover -s tests
+```
 
-1. Clone the repo
-   ```sh
-   git clone https://github.com/dsalaz04/Walmart-Capstone-Project
-   ```
-2. Create and start a virtual environment to contain all packages
-   ```sh
-   pip install virtualenv
-   cd my-project/
-   virtualenv venv
-   source venv/bin/activate
-   ```
-3. Install requirements if you haven't already
-   ```sh
-   pip install -r requirements.txt
-   ```
-4. Configure either 'Reddit_Scraper.py' or 'Tweet_Crawler.py' to be your main script
-5. If using Twitter, enter your API key in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
+13 offline tests cover topic matching (case/punctuation, per-author dedupe), sentiment
+scoring (lexicon overrides, negation handling, emoji safety), CSV loading, and the CLI
+end-to-end.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+## Project structure
 
+```
+reddit_sentiment.py    # main tool: collect -> find topics -> score -> visualize
+common_word_finder.py  # survey a community's vocabulary when tuning data.py
+data.py                # catalysts, blacklist, and the Walmart-tuned VADER lexicon
+sample_comments.csv    # demo input for offline mode
+tests/                 # offline test suite
+images/                # logo + example output
+```
 
+## Notes on this version
 
-<!-- USAGE EXAMPLES -->
-## Usage
+The project originally also included a Twitter crawler (Tweepy + MongoDB). It was
+retired: the Twitter v1.1 search API it used no longer exists, and search now requires
+a paid API tier. The Reddit pipeline was reworked for current library versions
+(`emoji` 2.x, modern NLTK/pandas), comment-level VADER scoring (the original scored
+word-by-word, which discards negation — "not good" scored as positive), credentials
+via environment variables instead of source code, and an offline CSV mode so the tool
+runs and is testable without API access.
 
-Work in Progress. We will add screenshots and usage descriptions here. This will be a section for usage
-based on the end user's perspective rather than the developer's perspective.
-
-_For more in depth usage, please refer to the [Documentation](https://docs.google.com/dsalaz04)_
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-<!-- ROADMAP -->
-## Roadmap
-
-- [x] Define platforms to use: Twitter, Reddit
-- [x] Define tags, types of posts to look for, etc.
-- [x] Build UI to interact with tool
-- [ ] Extend code for higher ambiguity and resuability
-
-See the [open issues](https://github.com/dsalaz04/Walmart-Capstone-Project/issues) for a full list of proposed features.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-If you would like to contribute to the project after the Spring 2022 term, feel free to do so by opening a
-pull request:
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/NewFeature`)
-3. Commit your Changes (`git commit -m 'Add NewFeature'`)
-4. Push to the Branch (`git push origin feature/NewFeature`)
-5. Open a Pull Request
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- LICENSE -->
-## License
-
-Not distributed under any license, but please contact us for reuse.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- CONTACT -->
-## Contact
-
-
-Project Link: [https://github.com/dsalaz04/Walmart-Capstone-Project](https://github.com/dsalaz04/Walmart-Capstone-Project)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* [Jonathan](https://github.com/Jmont03)
-* [Kayla](https://github.com/kaylasam)
-* [Caleb]()
-* [Tanner]()
-* [Josh]()
+Capstone group: [Jonathan](https://github.com/Jmont03), [Kayla](https://github.com/kaylasam),
+Caleb, Tanner, Josh.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+## License
 
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/dsalaz04/Walmart-Capstone-Project.svg?style=for-the-badge
-[contributors-url]: https://github.com/dsalaz04/Walmart-Capstone-Project/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/dsalaz04/Walmart-Capstone-Project.svg?style=for-the-badge
-[forks-url]: https://github.com/dsalaz04/Walmart-Capstone-Project/network/members
-[stars-shield]: https://img.shields.io/github/stars/dsalaz04/Walmart-Capstone-Project.svg?style=for-the-badge
-[stars-url]: https://github.com/dsalaz04/Walmart-Capstone-Project/stargazers
-[issues-shield]: https://img.shields.io/github/issues/dsalaz04/Walmart-Capstone-Project.svg?style=for-the-badge
-[issues-url]: https://github.com/dsalaz04/Walmart-Capstone-Project/issues
-[license-shield]: https://img.shields.io/github/license/dsalaz04/Walmart-Capstone-Project.svg?style=for-the-badge
-[license-url]: https://github.com/dsalaz04/Walmart-Capstone-Project/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/dsalaz04
-[product-screenshot]: images/screenshot.png
+University group capstone project; no formal license. Open an issue on the repository
+for reuse questions.
