@@ -105,10 +105,11 @@ def strip_token(word: str) -> str:
 def find_topics(comments: list[Comment]) -> tuple[Counter, dict[str, list[str]]]:
     """Count catalyst mentions and group comments by the topics they mention.
 
+    Tokens map to canonical topics via CATALYSTS ("wages" counts toward "pay").
     Each comment counts at most once per topic, and (when authors are known) each
     author counts at most once per topic, so one prolific commenter can't dominate.
     """
-    catalysts = {c.lower(): c for c in CATALYSTS}
+    catalysts = {token.lower(): topic for token, topic in CATALYSTS.items()}
     counts: Counter = Counter()
     by_topic: dict[str, list[str]] = {}
     seen_authors: dict[str, set[str]] = {}

@@ -36,6 +36,21 @@ class FindTopicsTest(unittest.TestCase):
         counts, _ = rs.find_topics(comments)
         self.assertEqual(counts["pay"], 2)  # alice once + bob once
 
+    def test_token_variants_merge_into_canonical_topic(self):
+        comments = [(None, "the wage is low"), (None, "wages went up"),
+                    (None, "pay day"), (None, "we should unionize")]
+        counts, by_topic = rs.find_topics(comments)
+        self.assertEqual(counts["pay"], 3)        # wage + wages + pay, one topic
+        self.assertEqual(len(by_topic["pay"]), 3)
+        self.assertNotIn("wage", counts)
+        self.assertNotIn("wages", counts)
+        self.assertEqual(counts["union"], 1)      # unionize -> union
+        self.assertNotIn("unionize", counts)
+
+    def test_variant_and_canonical_in_one_comment_count_once(self):
+        counts, _ = rs.find_topics([(None, "the wage... what a pay cut")])
+        self.assertEqual(counts["pay"], 1)
+
     def test_anonymous_comments_all_count(self):
         comments = [(None, "the pay"), (None, "the pay")]
         counts, _ = rs.find_topics(comments)

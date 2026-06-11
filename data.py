@@ -1,18 +1,46 @@
 """Domain vocabulary for r/walmart sentiment analysis.
 
-CATALYSTS are the workplace topics worth tracking (pay, scheduling, management, ...).
+CATALYSTS are the workplace topics worth tracking (pay, scheduling, management, ...),
+as a token -> canonical-topic map so variants ("wage", "wages") merge into one topic.
 BLACKLIST holds high-frequency words with no topical meaning, used when surveying a
 subreddit for candidate catalysts. LEXICON adjusts VADER's scores for words that carry
 a specific charge in Walmart-employee speech (e.g. "coached" is a disciplinary action,
 strongly negative, not a sports term).
 """
 
-# Topics of interest. A comment counts toward a topic when it mentions one of these.
+# Topics of interest. A comment counts toward a topic when it mentions a token (key);
+# counts and sentiment are reported under the canonical topic name (value).
+# PTO and PPTO stay separate (PPTO is Walmart's protected PTO — a distinct system),
+# as do 'coach'/'ASM'/'manager' (distinct roles) and 'masks' (policy gripes, not
+# pandemic discussion generally).
 CATALYSTS = {
-    'OGP', 'manager', 'covid', 'customer', 'pay', 'wage', 'coach', 'PTO', 'warehouse',
-    'zoning', 'wages', 'overnight', 'ASM', 'union', 'unionize', 'unionizing', 'vest',
-    'vests', 'retail', 'pallets', 'vendors', 'Amazon', 'promoted', 'promotion',
-    'pandemic', 'masks', 'ppto',
+    'OGP': 'OGP',
+    'manager': 'manager',
+    'covid': 'covid/pandemic',
+    'pandemic': 'covid/pandemic',
+    'customer': 'customer',
+    'pay': 'pay',
+    'wage': 'pay',
+    'wages': 'pay',
+    'coach': 'coach',
+    'PTO': 'PTO',
+    'warehouse': 'warehouse',
+    'zoning': 'zoning',
+    'overnight': 'overnight',
+    'ASM': 'ASM',
+    'union': 'union',
+    'unionize': 'union',
+    'unionizing': 'union',
+    'vest': 'vest',
+    'vests': 'vest',
+    'retail': 'retail',
+    'pallets': 'pallets',
+    'vendors': 'vendors',
+    'Amazon': 'Amazon',
+    'promoted': 'promotion',
+    'promotion': 'promotion',
+    'masks': 'masks',
+    'ppto': 'ppto',
 }
 
 # Common words to ignore when surveying a subreddit for new catalyst candidates.
