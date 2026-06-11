@@ -13,8 +13,6 @@ from data import CATALYSTS, LEXICON  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 
-rs.ensure_nltk_data()
-
 
 class FindTopicsTest(unittest.TestCase):
     def test_counts_catalyst_mentions(self):

@@ -26,28 +26,13 @@ import time
 from collections import Counter
 from pathlib import Path
 
-import emoji
 import matplotlib
 import pandas as pd
 
-import nltk
 from data import CATALYSTS, LEXICON
 
 # Comments are (author, body) pairs; offline sources have no author.
 Comment = tuple[str | None, str]
-
-_NLTK_RESOURCES = [
-    ("sentiment/vader_lexicon.zip", "vader_lexicon"),
-]
-
-
-def ensure_nltk_data() -> None:
-    """Download the NLTK resources we use, once, quietly."""
-    for path, name in _NLTK_RESOURCES:
-        try:
-            nltk.data.find(path)
-        except LookupError:
-            nltk.download(name, quiet=True)
 
 
 # --- collection -------------------------------------------------------------
@@ -129,7 +114,7 @@ def find_topics(comments: list[Comment]) -> tuple[Counter, dict[str, list[str]]]
 
 def make_analyzer():
     """A VADER analyzer with the r/walmart lexicon overrides applied."""
-    from nltk.sentiment.vader import SentimentIntensityAnalyzer
+    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
     analyzer = SentimentIntensityAnalyzer()
     analyzer.lexicon.update(LEXICON)
@@ -140,8 +125,8 @@ def score_topics(by_topic: dict[str, list[str]], topics: list[str],
                  analyzer=None) -> pd.DataFrame:
     """Average comment-level VADER sentiment for each topic.
 
-    Comments are scored whole (emojis stripped), so VADER can use negation,
-    capitalization and punctuation — scoring word-by-word would lose all of that.
+    Comments are scored whole, so VADER can use negation, capitalization,
+    punctuation and emoji — scoring word-by-word would lose all of that.
     Returns a DataFrame indexed by topic with Negative/Neutral/Positive columns.
     """
     analyzer = analyzer or make_analyzer()
@@ -150,7 +135,7 @@ def score_topics(by_topic: dict[str, list[str]], topics: list[str],
         totals = {"neg": 0.0, "neu": 0.0, "pos": 0.0}
         bodies = by_topic.get(topic, [])
         for body in bodies:
-            polarity = analyzer.polarity_scores(emoji.replace_emoji(body, ""))
+            polarity = analyzer.polarity_scores(body)
             for key in totals:
                 totals[key] += polarity[key]
         n = max(1, len(bodies))
@@ -216,7 +201,6 @@ def main(argv: list[str] | None = None) -> int:
         save_dir = Path(args.save)
         save_dir.mkdir(parents=True, exist_ok=True)
 
-    ensure_nltk_data()
     started = time.time()
     if args.input:
         comments = load_csv(args.input)

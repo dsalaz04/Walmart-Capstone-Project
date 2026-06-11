@@ -19,7 +19,7 @@ gauge associate sentiment from open, anonymous discussion rather than surveys.
 2. **Find topics.** Comments are matched against a curated list of workplace
    "catalysts" (pay, management, scheduling, PTO, union talk, ...) in `data.py`. Each
    author counts once per topic, so one prolific commenter can't skew the results.
-3. **Score sentiment** per topic with NLTK's VADER, with one crucial twist: a custom
+3. **Score sentiment** per topic with VADER (the `vaderSentiment` package), with one crucial twist: a custom
    lexicon for Walmart-employee vocabulary. In ordinary English "coached" is neutral —
    at Walmart it's a disciplinary action, and the lexicon scores it accordingly.
 4. **Report**: a treemap of the most-mentioned topics and a per-topic sentiment chart.
@@ -36,8 +36,7 @@ pip install -r requirements.txt
 python reddit_sentiment.py --input sample_comments.csv
 ```
 
-NLTK data downloads automatically on first run. Add `--save charts/` to write the
-charts to files instead of opening windows.
+Add `--save charts/` to write the charts to files instead of opening windows.
 
 ## Live mode
 
@@ -70,7 +69,7 @@ community-specific sentiment words to `LEXICON`.
 python -m unittest discover -s tests
 ```
 
-13 offline tests cover topic matching (case/punctuation, per-author dedupe), sentiment
+15 offline tests cover topic matching (case/punctuation, per-author dedupe), sentiment
 scoring (lexicon overrides, negation handling, emoji safety), CSV loading, and the CLI
 end-to-end.
 
@@ -90,7 +89,8 @@ images/                # logo + example output
 The project originally also included a Twitter crawler (Tweepy + MongoDB). It was
 retired: the Twitter v1.1 search API it used no longer exists, and search now requires
 a paid API tier. The Reddit pipeline was reworked for current library versions
-(`emoji` 2.x, modern NLTK/pandas), comment-level VADER scoring (the original scored
+(VADER now via the standalone `vaderSentiment` package — no NLTK data download, and
+emoji count as sentiment signal), comment-level VADER scoring (the original scored
 word-by-word, which discards negation — "not good" scored as positive), credentials
 via environment variables instead of source code, and an offline CSV mode so the tool
 runs and is testable without API access.

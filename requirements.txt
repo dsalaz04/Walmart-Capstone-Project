@@ -1,6 +1,5 @@
 praw>=7.7
-nltk>=3.8
+vaderSentiment>=3.3
 pandas>=2.0
 matplotlib>=3.7
 squarify>=0.4
-emoji>=2.0
