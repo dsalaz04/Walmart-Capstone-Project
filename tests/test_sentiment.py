@@ -1,15 +1,12 @@
 """Offline tests for the sentiment pipeline. Run: python -m unittest discover -s tests"""
 
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
-import reddit_sentiment as rs  # noqa: E402
-from common_word_finder import count_words  # noqa: E402
-from data import CATALYSTS, LEXICON  # noqa: E402
+import reddit_sentiment as rs
+from common_word_finder import count_words
+from data import CATALYSTS, LEXICON
 
 REPO = Path(__file__).resolve().parent.parent
 

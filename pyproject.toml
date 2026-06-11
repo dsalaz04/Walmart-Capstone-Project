@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "walmart-sentiment"
+version = "0.1.0"
+description = "Sentiment analysis of Walmart-employee discussion on Reddit"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "praw>=7.7",
+    "vaderSentiment>=3.3",
+    "pandas>=2.0",
+    "matplotlib>=3.7",
+    "squarify>=0.4",
+]
+
+[project.scripts]
+walmart-sentiment = "reddit_sentiment:main"
+walmart-words = "common_word_finder:main"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["reddit_sentiment.py", "common_word_finder.py", "data.py"]

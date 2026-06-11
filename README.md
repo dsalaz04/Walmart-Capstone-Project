@@ -32,7 +32,7 @@ gauge associate sentiment from open, anonymous discussion rather than surveys.
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+pip install -e .
 python reddit_sentiment.py --input sample_comments.csv
 ```
 
