@@ -38,8 +38,6 @@ Comment = tuple[str | None, str]
 
 _NLTK_RESOURCES = [
     ("sentiment/vader_lexicon.zip", "vader_lexicon"),
-    ("corpora/wordnet.zip", "wordnet"),
-    ("corpora/stopwords.zip", "stopwords"),
 ]
 
 
@@ -73,12 +71,12 @@ def fetch_comments(subreddit_name: str, post_limit: int | None) -> list[Comment]
 
     wanted_flairs = {"Daily Discussion", "Weekly Salt Mod", None}
     min_upvote_ratio = 0.70   # posts: at least 70% upvoted ...
-    min_post_upvotes = 20     # ... with this many upvotes
+    min_post_upvotes = 20     # ... with at least this many upvotes
     min_comment_score = 2     # comments: small quality bar
 
     comments: list[Comment] = []
     for post in reddit.subreddit(subreddit_name).hot(limit=post_limit):
-        if (post.upvote_ratio < min_upvote_ratio or post.ups <= min_post_upvotes
+        if (post.upvote_ratio < min_upvote_ratio or post.score < min_post_upvotes
                 or post.link_flair_text not in wanted_flairs):
             continue
         post.comments.replace_more(limit=1)
@@ -186,6 +184,7 @@ def visualize(counts: Counter, scores: pd.DataFrame, top_n: int,
         plt.savefig(save_dir / "sentiment.png", dpi=120, bbox_inches="tight")
     else:
         plt.show()
+    plt.close("all")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -196,7 +195,7 @@ def main(argv: list[str] | None = None) -> int:
                         help="subreddit to scrape live (needs API credentials)")
     source.add_argument("--input", default=None,
                         help="CSV with a 'comment' column to analyze offline")
-    parser.add_argument("--posts", type=int, default=25,
+    parser.add_argument("--posts", type=int, default=None,
                         help="post limit in live mode (default: 25)")
     parser.add_argument("--top", type=int, default=10,
                         help="how many topics to count in the treemap (default: 10)")
@@ -208,6 +207,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.subreddit and not args.input:
         parser.error("choose a source: --subreddit NAME or --input FILE.csv")
+    if args.input and args.posts is not None:
+        print("Warning: --posts is ignored in offline mode.", file=sys.stderr)
     save_dir = None
     if args.save:
         matplotlib.use("Agg")              # headless: don't try to open windows
@@ -220,7 +221,7 @@ def main(argv: list[str] | None = None) -> int:
         comments = load_csv(args.input)
         source_name = args.input
     else:
-        comments = fetch_comments(args.subreddit, args.posts)
+        comments = fetch_comments(args.subreddit, args.posts if args.posts is not None else 25)
         source_name = f"r/{args.subreddit}"
 
     counts, by_topic = find_topics(comments)

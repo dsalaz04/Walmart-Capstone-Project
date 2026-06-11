@@ -38,7 +38,7 @@ def main(argv: list[str] | None = None) -> int:
                         help="CSV with a 'comment' column to analyze offline")
     parser.add_argument("--top", type=int, default=30,
                         help="how many words to show (default: 30)")
-    parser.add_argument("--posts", type=int, default=25,
+    parser.add_argument("--posts", type=int, default=None,
                         help="post limit in live mode (default: 25)")
     parser.add_argument("--save", default=None, metavar="DIR",
                         help="write the chart to DIR instead of opening a window")
@@ -46,12 +46,15 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.subreddit and not args.input:
         parser.error("choose a source: --subreddit NAME or --input FILE.csv")
+    if args.input and args.posts is not None:
+        print("Warning: --posts is ignored in offline mode.", file=sys.stderr)
     if args.save:
         matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
     comments = (load_csv(args.input) if args.input
-                else fetch_comments(args.subreddit, args.posts))
+                else fetch_comments(args.subreddit,
+                                    args.posts if args.posts is not None else 25))
     top = count_words(comments).most_common(args.top)
     if not top:
         print("No words found.")
