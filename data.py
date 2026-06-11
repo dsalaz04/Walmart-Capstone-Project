@@ -57,49 +57,27 @@ BLACKLIST = {
 }
 
 # VADER lexicon overrides tuned to r/walmart (scores range 4.0 to -4.0).
+# Only words VADER's stock lexicon misses or misreads belong here: general
+# profanity/negativity (fuck, hate, pissed, ...) is already calibrated in stock
+# VADER, and overriding it to the floor flattened the signal. These are
+# Walmart-employee terms — disciplinary jargon, scheduling pain, benefits.
 LEXICON = {
-    'expectations': -4.0,
-    'fired': -4.0,
-    'fuck': -4.0,
-    'fucking': -4.0,
-    'shit': -4.0,
-    'terminated': -4.0,
-    'coached': -4.0,
-    'coaching': -4.0,
-    'asshole': -4.0,
-    'quitting': -4.0,
-    'ridiculous': -4.0,
-    'expensive': -4.0,
-    'stress': -4.0,
-    'understaffed': -4.0,
-    'lack': -4.0,
-    'broken': -4.0,
-    'pain': -4.0,
-    'hurt': -4.0,
-    'done': -4.0,
-    'mental': -4.0,
-    'stressed': -4.0,
-    'idiot': -4.0,
-    'idiots': -4.0,
-    'fucks': -4.0,
-    'hate': -4.0,
-    'screwed': -4.0,
-    'pissed': -4.0,
-    'wtf': -4.0,
-    'bullshit': -4.0,
-    'awesome': 4.0,
-    'gone': -1.0,
-    'money': -1.2,
-    'offering': -2.3,
-    'rip': -4.0,
-    'downgrade': -3.0,
-    'complaining': -3.0,
-    'corporate': -3.0,
-    'upgrade': 4.0,
-    'maintain': 1.0,
-    'bonuses': 1.0,
-    'scam': -2.0,
-    'positive': 3.0,
-    'upwards': 3.0,
-    'prediction': 1.0,
+    # Discipline and termination (a "coaching" is a formal write-up step).
+    'coached': -3.5,
+    'coaching': -3.0,
+    'write-up': -3.0,
+    'writeup': -3.0,
+    'terminated': -3.5,
+    # Working conditions and scheduling.
+    'understaffed': -2.5,
+    'underpaid': -3.0,
+    'overworked': -2.5,
+    'favoritism': -2.5,   # stock VADER scores this +0.7; in a workplace it's a gripe
+    'clopen': -2.0,       # closing shift followed by opening shift
+    'zoning': -1.5,       # tidying shelves: tedious, not catastrophic
+    'restock': -1.0,
+    'quitting': -2.0,     # talk of quitting signals dissatisfaction with the job
+    'corporate': -1.5,    # usually a venting target ("corporate doesn't care")
+    # Benefits.
+    'ppto': 1.5,          # Protected PTO — viewed positively as a benefit
 }
