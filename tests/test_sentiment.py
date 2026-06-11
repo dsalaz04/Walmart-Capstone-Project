@@ -90,7 +90,18 @@ class ScoreTopicsTest(unittest.TestCase):
 
     def test_rows_sum_to_roughly_one(self):
         scores = self.score({"pay": ["The pay is good", "pay is bad"]}, ["pay"])
-        self.assertAlmostEqual(float(scores.loc["pay"].sum()), 1.0, places=2)
+        proportions = scores.loc["pay", ["Negative", "Neutral", "Positive"]]
+        self.assertAlmostEqual(float(proportions.sum()), 1.0, places=2)
+
+    def test_compound_column_summarizes_net_sentiment(self):
+        by_topic = {
+            "pay": ["I love the new raise, it's wonderful and generous!"],
+            "manager": ["My manager is awful, I hate this, it's terrible."],
+        }
+        scores = self.score(by_topic, ["pay", "manager"])
+        self.assertIn("Compound", scores.columns)
+        self.assertGreater(scores.loc["pay", "Compound"], 0)
+        self.assertLess(scores.loc["manager", "Compound"], 0)
 
 
 class CsvAndEndToEndTest(unittest.TestCase):

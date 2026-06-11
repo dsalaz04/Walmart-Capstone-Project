@@ -38,7 +38,11 @@ Comment = tuple[str | None, str]
 # --- collection -------------------------------------------------------------
 
 def fetch_comments(subreddit_name: str, post_limit: int | None) -> list[Comment]:
-    """Pull comments from well-received posts in a subreddit via PRAW."""
+    """Pull comments from well-received posts in a subreddit via PRAW.
+
+    Collects the full comment tree (top-level comments and replies), since
+    pile-ons under a popular comment carry much of the sentiment.
+    """
     import praw  # imported lazily so offline mode needs no credentials
 
     client_id = os.environ.get("REDDIT_CLIENT_ID")
@@ -64,8 +68,8 @@ def fetch_comments(subreddit_name: str, post_limit: int | None) -> list[Comment]
         if (post.upvote_ratio < min_upvote_ratio or post.score < min_post_upvotes
                 or post.link_flair_text not in wanted_flairs):
             continue
-        post.comments.replace_more(limit=1)
-        for comment in post.comments:
+        post.comments.replace_more(limit=2)
+        for comment in post.comments.list():
             if comment.score > min_comment_score:
                 author = comment.author.name if comment.author else None
                 comments.append((author, comment.body))
@@ -127,12 +131,13 @@ def score_topics(by_topic: dict[str, list[str]], topics: list[str],
 
     Comments are scored whole, so VADER can use negation, capitalization,
     punctuation and emoji — scoring word-by-word would lose all of that.
-    Returns a DataFrame indexed by topic with Negative/Neutral/Positive columns.
+    Returns a DataFrame indexed by topic with Negative/Neutral/Positive columns
+    plus Compound, VADER's single -1..1 net-sentiment summary.
     """
     analyzer = analyzer or make_analyzer()
     rows = {}
     for topic in topics:
-        totals = {"neg": 0.0, "neu": 0.0, "pos": 0.0}
+        totals = {"neg": 0.0, "neu": 0.0, "pos": 0.0, "compound": 0.0}
         bodies = by_topic.get(topic, [])
         for body in bodies:
             polarity = analyzer.polarity_scores(body)
@@ -141,7 +146,8 @@ def score_topics(by_topic: dict[str, list[str]], topics: list[str],
         n = max(1, len(bodies))
         rows[topic] = {"Negative": totals["neg"] / n,
                        "Neutral": totals["neu"] / n,
-                       "Positive": totals["pos"] / n}
+                       "Positive": totals["pos"] / n,
+                       "Compound": totals["compound"] / n}
     return pd.DataFrame.from_dict(rows, orient="index")
 
 
@@ -162,9 +168,10 @@ def visualize(counts: Counter, scores: pd.DataFrame, top_n: int,
     if save_dir:
         plt.savefig(save_dir / "topics.png", dpi=120, bbox_inches="tight")
 
-    # Sentiment bars per analyzed topic.
-    scores.plot(kind="bar", color=["red", "gold", "forestgreen"],
-                title="Sentiment by topic", figsize=(10, 6))
+    # Sentiment bars per analyzed topic (Compound belongs in the table, not here).
+    scores[["Negative", "Neutral", "Positive"]].plot(
+        kind="bar", color=["red", "gold", "forestgreen"],
+        title="Sentiment by topic", figsize=(10, 6))
     plt.tight_layout()
     if save_dir:
         plt.savefig(save_dir / "sentiment.png", dpi=120, bbox_inches="tight")

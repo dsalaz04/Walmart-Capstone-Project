@@ -69,7 +69,7 @@ community-specific sentiment words to `LEXICON`.
 python -m unittest discover -s tests
 ```
 
-15 offline tests cover topic matching (case/punctuation, per-author dedupe), sentiment
+16 offline tests cover topic matching (case/punctuation, per-author dedupe), sentiment
 scoring (lexicon overrides, negation handling, emoji safety), CSV loading, and the CLI
 end-to-end.
 
